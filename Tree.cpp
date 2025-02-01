@@ -15,18 +15,33 @@ replicate these tests.
 #include "Tree.h"
 #include "Node.h"
 
+//Stores a euler tour of the tree
 vector<int> eTour;
+//Stores a euler tour of the tree where the value of the node has been replaced by its depth in the tree
 vector<int> eTourDepth;
+//Stores the Range-min query for least common ancestors
 vector<int> RMQLCA[20];
+//Stores the Range-min query for least common ancestors by index
 vector<int> RMQLCAindex[20];
+//Stores the index of the first time a node appears in a euler tour
 vector<int> eulerFirst;
+//Stores the index of the last time a node appears in a euler tour
 vector<int> eulerLast;
+//The index is representative of a post-order traversal.  The values in this vector represent that
+//nodes location in a pre-order traversal
 vector<int> postOrderSeqPreLabels;
+//The index is representative of a post-order traversal.  The values represent that nodes value
 vector<int> postOrderSeqValLabels;
+//The index is representative of the value of the node.  The value in this vector represents that nodes location
+//in a post-order traversal
 vector<int> indexByValuePostOrder;
+//The same as the above vector but only for the left subtree
 vector<int> indexByValuePostOrderSubtreeLeft;
+//The same as the above vector but for the right subtree
 vector<int> indexByValuePostOrderSubtreeRight;
+//Stores the Range-min query for subtrees
 vector<int> RMQSubtree[20];
+//Stores the Range-min query for subtrees by index
 vector<int> RMQSubtreeindex[20];
 vector<int> parentVector;
 vector<int> nextLowestPower;
