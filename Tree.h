@@ -1,4 +1,6 @@
 // Created by James Browning on 4/12/24.
+// This file contains the class definition for the tree class as well as the 
+// declarations for some global variables
 
 #ifndef ADSIMPLEMENTATION_TREE_H
 #define ADSIMPLEMENTATION_TREE_H
