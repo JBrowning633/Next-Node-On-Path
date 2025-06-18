@@ -1,7 +1,12 @@
 //
 // Created by James Browning on 4/12/24.
 //
-//This header file contains all the get and set declarations and implementations
+//This header file contains all the get and set declarations and implementations for the node class
+
+//Aside from the regular variables and their functions, there are also variables to track the depth
+//of the node in the tree, the position of the node in a pre order traversal, and the first and last 
+//positions in which the node appears in a euler tour of the tree.
+
 
 #ifndef ADSIMPLEMENTATION_NODE_H
 #define ADSIMPLEMENTATION_NODE_H
