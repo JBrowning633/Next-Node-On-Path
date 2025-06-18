@@ -7,6 +7,7 @@ replicate these tests.
 */
 
 #include <iostream>
+#include <vector>
 #include <random>
 #include <chrono>
 #include <cmath>
@@ -15,33 +16,35 @@ replicate these tests.
 #include "Tree.h"
 #include "Node.h"
 
-//Stores a euler tour of the tree
+using namespace std;
+
+// Stores a euler tour of the tree
 vector<int> eTour;
-//Stores a euler tour of the tree where the value of the node has been replaced by its depth in the tree
+// Stores a euler tour of the tree where the value of the node has been replaced by its depth in the tree
 vector<int> eTourDepth;
-//Stores the Range-min query for least common ancestors
+// Stores the Range-min query for least common ancestors
 vector<int> RMQLCA[20];
-//Stores the Range-min query for least common ancestors by index
+// Stores the Range-min query for least common ancestors by index
 vector<int> RMQLCAindex[20];
-//Stores the index of the first time a node appears in a euler tour
+// Stores the index of the first time a node appears in a euler tour
 vector<int> eulerFirst;
-//Stores the index of the last time a node appears in a euler tour
+// Stores the index of the last time a node appears in a euler tour
 vector<int> eulerLast;
-//The index is representative of a post-order traversal.  The values in this vector represent that
-//nodes location in a pre-order traversal
+// The index is representative of a post-order traversal.  The values in this vector represent that
+// nodes index in a pre-order traversal
 vector<int> postOrderSeqPreLabels;
-//The index is representative of a post-order traversal.  The values represent that nodes value
+// The index is representative of a post-order traversal.  The values represent that nodes integer value
 vector<int> postOrderSeqValLabels;
-//The index is representative of the value of the node.  The value in this vector represents that nodes location
-//in a post-order traversal
+// The index is representative of the value of the node.  The value in this vector represents that nodes index
+// in a post-order traversal
 vector<int> indexByValuePostOrder;
-//The same as the above vector but only for the left subtree
+// The same as the above vector but only for the left subtree
 vector<int> indexByValuePostOrderSubtreeLeft;
-//The same as the above vector but for the right subtree
+// The same as the above vector but for the right subtree
 vector<int> indexByValuePostOrderSubtreeRight;
-//Stores the Range-min query for subtrees
+// Stores the Range-min query for subtrees
 vector<int> RMQSubtree[20];
-//Stores the Range-min query for subtrees by index
+// Stores the Range-min query for subtrees by index
 vector<int> RMQSubtreeindex[20];
 vector<int> parentVector;
 vector<int> nextLowestPower;
@@ -160,6 +163,8 @@ void Tree::deleteTree(TreeNode *sel) {
 }
 
 void Tree::display() const{
+    // This is really only usable for small trees, if error checking with a large tree is desired, use a
+    // different program that is known to be accurate
     // either display empty tree if the root points to nullptr or call the other display function and pass in the root
     // for the pointer and an integer 1 for the level
     if (root == nullptr){
@@ -206,6 +211,8 @@ void Tree::eulerTour() {
 }
 
 void Tree::eulerTour(TreeNode *node) {
+    // Simultaneously generates a regular euler tour of the tree and also a euler tour where the recorded
+    // value of each node is the depth instead of the actual value
     eTour.push_back(node->getValue());
     eTourDepth.push_back(node->getDepth());
     if(node->getLeft() != nullptr){
@@ -221,6 +228,8 @@ void Tree::eulerTour(TreeNode *node) {
 }
 
 void Tree::windowMinsforLCA(){
+    // Calculates the correct size for the windows of the LCA sparse table and generates the table.  This
+    // table allows the program to perform O(1) (constant time) LCA queries.
     vector<int> temp = eTourDepth;
     sizeDepth = eTourDepth.size();
     int iter = 2;
@@ -246,6 +255,7 @@ void Tree::windowMinsforLCA(){
 }
 
 vector<int> Tree::RMQblockGeneratorforLCA(vector<int> n, int tail, int width, int index){
+    // Generates the individual blocks of the sparse table described in its calling function.
     int y;
     int iterator = 0;
     int min;
@@ -278,6 +288,10 @@ vector<int> Tree::RMQblockGeneratorforLCA(vector<int> n, int tail, int width, in
 }
 
 int Tree::RMQ(int L, int R, int type) {
+    // Performs both range min queries on the LCA sparse table for the entire tree
+    // (in the event that the first integer (i) is not an ancestor of the second integer (j)) and
+    // also performs the subtree range min queries to find the node that appears first in the 
+    // pre order traversal in that subtree
     int range = abs(R - L) + 1;
     int nextLwstpwr = nextLowestPower[range];
     if (type == 0) {
@@ -303,6 +317,7 @@ int Tree::RMQ(int L, int R, int type) {
 }
 
 int Tree::LCA(int i, int j){
+    // Returns the LCA of two integers
     int L = eulerFirst[i];
     int R = eulerLast[j];
     if (L > R){
@@ -314,6 +329,7 @@ int Tree::LCA(int i, int j){
 }
 
 void Tree::windowMinsforSubtree(){
+    // Generates the sparse table for the pre order index subtree range min queries
     vector<int> temp = postOrderSeqPreLabels; // 2, 3, 5, 9, 17
     sizePostOrder = postOrderSeqPreLabels.size();
     int iter = 2;
@@ -339,6 +355,7 @@ void Tree::windowMinsforSubtree(){
 }
 
 vector<int> Tree::RMQblockGeneratorforSubtree(vector<int> n, int tail, int width, int index) {
+    // Similar to above RMQ generator but for the subtree windows
     int y;
     int iterator = 0;
     int min;
@@ -371,6 +388,7 @@ vector<int> Tree::RMQblockGeneratorforSubtree(vector<int> n, int tail, int width
 }
 
 int Tree::yChildLocator(int i, int j){
+    //Identifies the child of i that is the next node on the path to j in the event that i is an ancestor of j
     int L = indexByValuePostOrder[j];
     int R = indexByValuePostOrderSubtreeRight[i];
     int yChild = RMQ(L, R, 1);
@@ -378,6 +396,7 @@ int Tree::yChildLocator(int i, int j){
 }
 
 void Tree::preOrder(TreeNode *node){
+    // Generates a pre order traversal of the tree
     if (node == nullptr){
         return;
     }
@@ -388,6 +407,7 @@ void Tree::preOrder(TreeNode *node){
 }
 
 void Tree::postOrder(TreeNode *node){
+    // Generates a post order traversal of the tree
     if (node == nullptr){
         return;
     }
@@ -403,6 +423,8 @@ void Tree::postOrder(TreeNode *node){
 }
 
 void Tree::indexByValueSubtrees(){
+    // Populates the vectors shown below, where the index is the value of the node and the value is
+    // the index in a post order traversal
     int x = 0;
     TreeNode * node;
     vector<int> subTree;
@@ -420,6 +442,7 @@ void Tree::indexByValueSubtrees(){
 }
 
 void Tree::postOrderSubtrees(TreeNode *node, vector<int> *subTree){
+    // Generates the post order traversal of the subtrees
     if (node == nullptr){
         return;
     }
@@ -430,6 +453,7 @@ void Tree::postOrderSubtrees(TreeNode *node, vector<int> *subTree){
 }
 
 void Tree::setEulerFirstLast(){
+    // Identifies the first and last time a node appears in a euler tour
     int x = 0;
     int value;
     TreeNode * node;
@@ -447,6 +471,8 @@ void Tree::setEulerFirstLast(){
 }
 
 void Tree::eulerFirstLastPreprocess(TreeNode * node){
+    // Recursive
+    // Preprocessing step for the above function
     if (node == nullptr){
         return;
     }
@@ -468,6 +494,7 @@ int Tree::nextNodeOnPath(int i, int j) {
 }
 
 void Tree::nextLowestPowerGenerator() {
+    // For the identification of block size for the RMQ on the eTour where the values are depths,
     int nextLwstpwr;
     int maxSize = 0;
     while (maxSize < eTour.size()) {
@@ -485,20 +512,24 @@ void Tree::nextLowestPowerGenerator() {
 //uncomment lines 484-496 and line 520.  There is also a display function available at the bottom for reference.
 //However, it's pretty ugly and difficult to read (especially with a large tree).
 int main() {
+    int userTreeSize;
+    int i;
+    int j;
+    cout << "Please Select the size of tree you would like to use" << endl << endl;
+    cin >> userTreeSize;
+    cout << "Please enter the nodes that you wish to find the next node on the path from the first integer to the second" <<
+     endl << endl << "Keep in mind that the nodes you enter must each have values less than or equal to the size of the tree"
+     << endl << endl;
+    cout << "First node:";
+    cin >> i;
+    cout << endl << "Second node:";
+    cin >> j;
+    cout << endl;
+    
     Tree *myTree = new Tree();
-    myTree->insert(5);
-    myTree->insert(3);
-    myTree->insert(4);
-    myTree->insert(6);
-    myTree->insert(7);
-    myTree->insert(9);
-    myTree->insert(12);
-    myTree->insert(11);
-    myTree->insert(1);
-    myTree->insert(2);
-    /*vector<int> randomSequence;
+    vector<int> randomSequence;
     int x = 1;
-    while (x <= 1000) {
+    while (x <= userTreeSize) {
         randomSequence.push_back(x);
         x++;
     }
@@ -508,7 +539,7 @@ int main() {
     while (!randomSequence.empty()){
         myTree->insert(randomSequence.back());
         randomSequence.pop_back();
-    }*/
+    }
 
     //Preprocessing for nextNodeOnPath
     myTree->eulerTour();
@@ -527,16 +558,15 @@ int main() {
 
 
     //nextNodeOnPath function call
-    //The timer was copied from stackoverflow
-    //https://stackoverflow.com/questions/25483620/how-to-measure-running-time-of-specific-function-in-c-very-accurate
-    //It is only used for evaluation of the program
     typedef std::chrono::high_resolution_clock Clock;
     auto t1 = Clock::now();
-    //cout << myTree->nextNodeOnPath(254, 599) << "\n";
-    cout << myTree->nextNodeOnPath(3, 2) << "\n";
+    std::cout << "The next node on the path from " << i << " to " << j << " is ";
+    std::cout << myTree->nextNodeOnPath(i, j) << endl;
     auto t2 = Clock::now();
-    std::cout <<std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count() << '\n';
-    myTree->display();
+    std::cout << "The time taken to find the next node on the path is ";
+    std::cout <<std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count() << " nanoseconds" << endl;
+    //Uncomment this if you want to use the display function
+    //myTree->display();
     return 0;
 }
 
